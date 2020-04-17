@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+<html lang="en">
+{% block content%}
+{% if error %}
+{{ error }}
+{% endif %}
+
+<h1>Create Rounds</h1>
+<!--<form method="POST" action="{% url 'createround' %}" enctype="multipart/form-data">-->
+<!--    {% csrf_token %}-->
+<!--    <br>-->
+<!--    Title:-->
+<!--    <br>-->
+<!--    <input type="text" name="title">-->
+<!--    <br>-->
+<!--    Rounds:-->
+<!--    <br>-->
+<!--    <input type="text" name="rounds">-->
+<!--    <br>-->
+<!--    <br>-->
+<!--    <input class="btn btn-success" type="submit" value="Create">-->
+<!--</form>-->
+{% endblock %}
+</html>

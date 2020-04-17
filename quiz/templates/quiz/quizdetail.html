@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+<html lang="en">
+{% block content%}
+<h1> {{ quiz.title }}</h1>
+<div class="container">
+    <br>
+    <p> Date: {{quiz.pub_date_pretty}}</p>
+    <br>
+    <p>Created by: {{quiz.founder}}</p>
+    <br>
+</div>
+<!--<p>-->
+<!--    <a href="{% url 'round' %}" class="btn btn-primary my-2">Add Round</a>-->
+<!--</p>-->
+<h4>Add Round</h4>
+<form method="POST" action="{% url 'createrounds' quiz.id %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <br>
+    Title:
+    <br>
+    <input type="text" name="title">
+    <br>
+    <br>
+    <input class="btn btn-success" type="submit" value="Create">
+</form>
+{% endblock %}
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+<html lang="en">
+{% block content%}
+{% if error %}
+{{ error }}
+{% endif %}
+
+<h1>Quiz Questions</h1>
+<form method="POST" action="{% url 'questions' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <br>
+    Question:
+    <br>
+    <input type="text" name="prompt">
+    <br>
+    Answer:
+    <br>
+    <input type="text" name="answer">
+    <br>
+    <br>
+    <input class="btn btn-success" type="submit" value="Submit Question">
+</form>
+{% endblock %}
+</html>
