@@ -29,9 +29,9 @@ def create(request):
         return render(request, 'quiz/create.html')
 
 
-# def rounds(request):
+def rounds(request):
     # round1 = get_object_or_404(Quiz, pk=round_id)
-    # return render(request, 'quiz/round.html')
+    return render(request, 'quiz/round.html')
 
 
 def createrounds(request, quiz_id):
@@ -42,7 +42,7 @@ def createrounds(request, quiz_id):
             r.title = request.POST['title']
             r.quiz = quiz
             r.save()
-            return render('/round/' + str(r.id))
+            return redirect('quiz/round/' + str(r.id))
         else:
             return render(request, 'quiz/quizdetail.html', {'error': ' All fields must be filled out'})
     else:
