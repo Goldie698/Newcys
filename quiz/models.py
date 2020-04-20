@@ -24,6 +24,7 @@ class Quiz(models.Model):
         return self.title
 
 
+
 class Round(models.Model):
     title = models.CharField(max_length=200)
     # number = models.IntegerField(default=1)

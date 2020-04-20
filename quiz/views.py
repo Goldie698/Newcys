@@ -6,7 +6,8 @@ from django.utils import timezone
 
 # Create your views here.
 def home(request):
-    return render(request, 'quiz/home.html')
+    quizzes = Quiz.objects.all()
+    return render(request, 'quiz/home.html', {'quizlist': quizzes})
 
 
 @login_required

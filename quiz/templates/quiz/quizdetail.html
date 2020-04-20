@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 {% extends 'base.html' %}
 <html lang="en">
+<!--{% load static %}-->
+<!--<link rel="stylesheet" href="{% static 'js/quizdetail.js' %}">-->
 {% block content%}
 <h1> {{ quiz.title }}</h1>
 <div class="container">
@@ -17,10 +19,12 @@
 <br>
 <h3> {{r.title}}</h3>
 <!--<input type="button" class="btn btn-primary" value="Add Questions">-->
+
 {% for q in range %}
 <br>
 <form method="POST" action="{% url 'createquestion' r.id %}" enctype="multipart/form-data">
     {% csrf_token %}
+    <br>
     Question {{q}}:
     <br>
     <input type="text" name="prompt">
@@ -33,6 +37,7 @@
     <input class="btn btn-success" type="submit" value="Create">
 </form>
 {% endfor %}
+
 {% endfor %}
 {% endblock %}
 </html>
