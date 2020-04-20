@@ -13,16 +13,26 @@
 <!--<p>-->
 <!--    <a href="{% url 'round' %}" class="btn btn-primary my-2">Add Round</a>-->
 <!--</p>-->
-<h4>Add Round</h4>
-<form method="POST" action="{% url 'createrounds' quiz.id %}" enctype="multipart/form-data">
+{% for r in round%}
+<br>
+<h3> {{r.title}}</h3>
+<!--<input type="button" class="btn btn-primary" value="Add Questions">-->
+{% for q in range %}
+<br>
+<form method="POST" action="{% url 'createquestion' r.id %}" enctype="multipart/form-data">
     {% csrf_token %}
+    Question {{q}}:
     <br>
-    Title:
+    <input type="text" name="prompt">
     <br>
-    <input type="text" name="title">
+    Answer:
+    <br>
+    <input type="text" name="answer">
     <br>
     <br>
     <input class="btn btn-success" type="submit" value="Create">
 </form>
+{% endfor %}
+{% endfor %}
 {% endblock %}
 </html>

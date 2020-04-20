@@ -11,6 +11,8 @@ class Quiz(models.Model):
     pub_date = models.DateTimeField()
     participants = models.IntegerField()
     founder = models.ForeignKey(User, on_delete=models.CASCADE)
+    rounds = models.IntegerField()
+    numqs = models.IntegerField(default=0)
 
     def summary(self):
         return self.body[:200]
