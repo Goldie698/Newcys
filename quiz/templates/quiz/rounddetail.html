@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+<html lang="en">
+{% block content%}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<a href="{% url 'quizdetail' quiz.id %}">Back to quiz</a>
+
+<div class="container">
+    <h1> {{round.title}}</h1>
+    <br>
+    <div>
+        <a href="{% url 'questions' quiz.id round.id%}" class="btn btn-primary my-2">Add Question</a>
+    </div>
+    {% for question in questions%}
+    <br>
+    <p>Question: {{question.prompt}} </p>
+    <p>Answer: {{question.answer}}</p>
+    {% endfor%}
+    <br>
+</div>
+</body>
+{% endblock %}
+</html>

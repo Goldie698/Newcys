@@ -7,7 +7,7 @@
 {% endif %}
 
 <h1>Quiz Questions</h1>
-<form method="POST" action="{% url 'questions' %}" enctype="multipart/form-data">
+<form method="POST" action="{% url 'submitquestion' quiz.id round.id %}" enctype="multipart/form-data">
     {% csrf_token %}
     <br>
     Question:
