@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+<html lang="en">
+{% block content%}
+{% load static %}
+<div class="album py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            {% for quiz in quizzes %}
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <img class="card-img-top img-fluid" src="{% static 'quiz2.png' %}" alt="Card image cap">
+                    <div class="card-body">
+                        <a class="card-text text-center" href="{% url 'quizdetail' quiz.id %}">{{ quiz.title }}</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% if quizzes|length_is:"0" %}
+            <p> You have not created any quizzes yet</p>
+            {% endif%}
+        </div>
+    </div>
+</div>
+{% endblock %}
+</html>

@@ -90,3 +90,8 @@ def submitquestion(request, quiz_id, round_id, ):
                                                            'error': ' All fields must be filled out'})
     else:
         return render(request, 'quiz/questions.html')
+
+
+def editquiz(request):
+    quizzes = Quiz.objects.filter(founder=request.user)
+    return render(request, 'quiz/editquiz.html', {'quizzes': quizzes})
