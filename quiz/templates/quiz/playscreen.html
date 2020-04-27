@@ -1,0 +1,23 @@
+
+
+
+<!DOCTYPE html>
+{% extends 'base.html' %}
+<html lang="en">
+{% block content%}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  {% if quizCode %}
+      {% for code in quizCode %}
+          <h1>You're Playing the quiz {{ quizCode }}</h1>
+      {% endfor %}
+  {% else %}
+      <p>No codes are available.</p>
+  {% endif %}
+</body>
+{% endblock %}
+</html>

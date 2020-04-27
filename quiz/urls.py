@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('playscreen', views.playscreen, name='playscreen'),
+    path('play', views.play, name='play'),
     path('create', views.create, name='create'),
     path('<int:quiz_id>', views.quizdetail, name='quizdetail'),
     path('', views.create, name='quiz/create'),

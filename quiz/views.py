@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import Quiz, Round, Question
 from django.utils import timezone
+from django import forms
+
 
 
 # Create your views here.
@@ -27,6 +29,15 @@ def create(request):
     else:
         return render(request, 'quiz/create.html')
 
+def play(request):
+    return render(request, 'quiz/play.html')
+
+def playscreen(request):
+    data = request.POST.copy()
+    quizCode = data.get('quizCode')
+    context = {'quizCode': quizCode}
+    #need to get the code from the post request from the form
+    return render(request, 'quiz/playscreen.html', context)
 
 def quizdetail(request, quiz_id):
     quiz = get_object_or_404(Quiz, pk=quiz_id)
