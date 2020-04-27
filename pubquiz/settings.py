@@ -54,7 +54,7 @@ ROOT_URLCONF = 'pubquiz.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['pubquiz/templates'],
+        'DIRS': ['pubquiz/templates', 'accounts/templates/accounts', 'quiz/templates/quiz'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
