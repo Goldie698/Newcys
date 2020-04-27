@@ -5,12 +5,17 @@ from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
 
+
 class Quiz(models.Model):
     private = models.BooleanField()
     title = models.CharField(max_length=255)
     pub_date = models.DateTimeField()
     participants = models.IntegerField()
     founder = models.ForeignKey(User, on_delete=models.CASCADE)
+    # url = models.SlugField(
+    #     max_length=60, blank=False,
+    #     help_text="a user friendly url",
+    #     verbose_name="user friendly url")
 
     def summary(self):
         return self.body[:200]
@@ -20,7 +25,6 @@ class Quiz(models.Model):
 
     def __str__(self):
         return self.title
-
 
 
 class Round(models.Model):

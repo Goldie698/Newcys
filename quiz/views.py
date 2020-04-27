@@ -31,7 +31,18 @@ def create(request):
 def quizdetail(request, quiz_id):
     quiz = get_object_or_404(Quiz, pk=quiz_id)
     rounds = Round.objects.filter(quiz=quiz)
-    return render(request, 'quiz/quizdetail.html', {'quiz': quiz, 'rounds': rounds})
+    questions = []
+    if quiz.founder == request.user:
+        return render(request, 'quiz/quizdetail.html', {'quiz': quiz, 'rounds': rounds})
+    else:
+        for r in rounds:
+            question = Question.objects.filter(round=r)
+            if question:
+                questions.append(question)
+        if questions.__len__() <= 0:
+            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
+        else:
+            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds, 'questions': questions})
 
 
 def round(request, quiz_id):
@@ -70,12 +81,12 @@ def questions(request, quiz_id, round_id):
     return render(request, 'quiz/questions.html', {'quiz': quiz, 'round': round})
 
 
-def submitquestion(request, quiz_id, round_id, ):
+def submitquestion(request, quiz_id, round_id):
     if request.method == 'POST':
-        if request.POST['prompt']:
+        round = get_object_or_404(Round, pk=round_id)
+        quiz = Quiz.objects.get(round=round)
+        if request.POST['prompt'] and request.POST['answer']:
             q = Question()
-            round = get_object_or_404(Round, pk=round_id)
-            quiz = Quiz.objects.get(round=round)
             q.round = round
             q.prompt = request.POST['prompt']
             q.answer = request.POST['answer']
@@ -83,8 +94,6 @@ def submitquestion(request, quiz_id, round_id, ):
             questions = Question.objects.filter(round=round)
             return render(request, 'quiz/rounddetail.html', {'round': round, 'quiz': quiz, 'questions': questions})
         else:
-            round = get_object_or_404(Round, pk=round_id)
-            quiz = Quiz.objects.get(round=round)
             questions = Question.objects.filter(round=round)
             return render(request, 'quiz/questions.html', {'round': round, 'quiz': quiz, 'questions': questions,
                                                            'error': ' All fields must be filled out'})
@@ -95,3 +104,16 @@ def submitquestion(request, quiz_id, round_id, ):
 def editquiz(request):
     quizzes = Quiz.objects.filter(founder=request.user)
     return render(request, 'quiz/editquiz.html', {'quizzes': quizzes})
+
+
+# def playquiz(request, q_id):
+#     if request.method == 'POST':
+#         question = get_object_or_404(Question, pk=q_id)
+#         # questions = Question.objects.filter(round=round)
+#         answer = request.POST['answer' + str(q_id)]
+#         print(answer)
+#         if question.answer == answer:
+#             # form = request.POST
+#             return redirect(request.META.get('HTTP_REFERER', {'answer': answer}))
+#         else:
+#             pass
