@@ -12,7 +12,7 @@ def home(request):
     return render(request, 'quiz/home.html', {'quizlist': quizzes})
 
 
-@login_required
+@login_required(login_url='login')
 def create(request):
     if request.method == 'POST':
         if request.POST['title']:
@@ -127,7 +127,7 @@ def submitquestion(request, quiz_id, round_id):
     else:
         return render(request, 'quiz/questions.html')
 
-
+@login_required(login_url='login')
 def editquiz(request):
     quizzes = Quiz.objects.filter(founder=request.user)
     return render(request, 'quiz/editquiz.html', {'quizzes': quizzes})
