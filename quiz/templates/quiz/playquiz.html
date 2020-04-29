@@ -16,15 +16,21 @@
 <br>
 {% for round in rounds%}
 <h3>{{ round }}</h3>
+<p> Previous score: {{ round.score }}%</p>
 {% if answers %}
 {% if played == round %}
 {{answers}}
 {% endif %}
 {% endif %}
-
+{% if round.score %}
+<div>
+    <a href="{% url 'quiz/playquiz' round.id %}" class="Next round">&#8250;Play Again </a>
+</div>
+{% else %}
 <div>
     <a href="{% url 'quiz/playquiz' round.id %}" class="Next round">&#8250;Play </a>
 </div>
+{% endif %}
 <br>
 {% endfor %}
 {% endblock %}

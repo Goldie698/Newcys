@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRe
 from django.contrib.auth.decorators import login_required
 from .models import Quiz, Round, Question
 from django.utils import timezone
+import re
 
 
 # Create your views here.
@@ -129,14 +130,20 @@ def playquiz(request, round_id):
         for q in questions:
             answerId = q.id
             # print(request.POST.get(str(answerId), None))
-            if request.POST[str(answerId)] and request.POST[str(answerId).lower()] == str(q.answer).lower():
-                count += 1
-                print('Found the right answer')
-            else:
-                print('Incorrect answer' + str(q.prompt))
+            if request.POST[str(answerId)]:
+                answer = str(q.answer)
+                useranswer = request.POST[str(answerId).lower()]
+                if re.findall('(?i)' + answer, useranswer):
+                    count += 1
+                    print('Found the right answer')
+                else:
+                    print('Incorrect answer' + str(q.prompt))
     quiz = round.quiz
+    count2 = (count / len(questions) * 100)
+    round.score = count2
+    round.save()
     rounds = Round.objects.filter(quiz=quiz)
-    round.score = count
     return render(request, 'quiz/playquiz.html',
                   {'quiz': quiz, 'rounds': rounds,
-                   'answers': 'Previously correct: ' + str(count) + '/' + str(len(questions)), 'played': round})
+                   'answers': 'Result: ' + str(count) + '/' + str(len(questions)), 'played': round,
+                   'len': str(len(questions))})
