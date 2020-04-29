@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from .models import Quiz, Round, Question
+from .models import Quiz, Round, Question, QuizTakers, Response
 from django.utils import timezone
 import re
 
@@ -55,6 +55,10 @@ def quizdetail(request, quiz_id):
     if quiz.founder == request.user:
         return render(request, 'quiz/quizdetail.html', {'quiz': quiz, 'rounds': rounds})
     else:
+        quiztaker = QuizTakers()
+        quiztaker.quiz = quiz
+        quiztaker.user = request.user
+        quiztaker.save()
         return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
 
 
@@ -122,28 +126,39 @@ def editquiz(request):
 
 def playquiz(request, round_id):
     round = get_object_or_404(Round, pk=round_id)
-    questions = Question.objects.filter(round=round)
-    count = 0
-    if request.method == 'GET':
-        return render(request, 'quiz/playround.html', {'round': round, 'questions': questions})
-    elif request.method == 'POST':
-        for q in questions:
-            answerId = q.id
-            # print(request.POST.get(str(answerId), None))
-            if request.POST[str(answerId)]:
-                answer = str(q.answer)
-                useranswer = request.POST[str(answerId).lower()]
-                if re.findall('(?i)' + answer, useranswer):
-                    count += 1
-                    print('Found the right answer')
-                else:
-                    print('Incorrect answer' + str(q.prompt))
-    quiz = round.quiz
-    count2 = (count / len(questions) * 100)
-    round.score = count2
-    round.save()
-    rounds = Round.objects.filter(quiz=quiz)
-    return render(request, 'quiz/playquiz.html',
-                  {'quiz': quiz, 'rounds': rounds,
-                   'answers': 'Result: ' + str(count) + '/' + str(len(questions)), 'played': round,
-                   'len': str(len(questions))})
+    quiztaker = QuizTakers.objects.filter(user=request.user, quiz=round.quiz)
+    if quiztaker:
+        questions = Question.objects.filter(round=round)
+        count = 0
+        if request.method == 'GET':
+            return render(request, 'quiz/playround.html', {'round': round, 'questions': questions})
+        elif request.method == 'POST':
+            userResponses = []
+            for q in questions:
+                answerId = q.id
+                # print(request.POST.get(str(answerId), None))
+                if request.POST[str(answerId)]:
+                    answer = str(q.answer)
+                    useranswer = request.POST[str(answerId).lower()]
+                    response = Response()
+                    response.quiztaker = quiztaker.first()
+                    response.question = q
+                    response.answer = useranswer
+                    response.save()
+                    userResponses.append(response)
+                    if re.findall('(?i)' + answer, useranswer):
+                        count += 1
+                        print('Found the right answer')
+                    else:
+                        print('Incorrect answer' + str(q.prompt))
+        quiz = round.quiz
+        count2 = (count / len(questions) * 100)
+        # round.score = count2
+        # round.save()
+        rounds = Round.objects.filter(quiz=quiz)
+        return render(request, 'quiz/playquiz.html',
+                      {'quiz': quiz, 'rounds': rounds,
+                       'answers': 'Result: ' + str(count) + '/' + str(len(questions)), 'played': round,
+                       'len': str(len(questions)), 'responses': userResponses})
+    else:
+        print('Something went wrong')

@@ -1,5 +1,8 @@
 from django.urls import path
+
+from pubquiz import settings
 from . import views
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('playscreen', views.playscreen, name='playscreen'),
@@ -15,4 +18,4 @@ urlpatterns = [
     path('<int:quiz_id>/round/<int:round_id>/questions', views.questions, name='questions'),
     path('<int:quiz_id>/round/<int:round_id>/submitquestion', views.submitquestion, name='submitquestion'),
 
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

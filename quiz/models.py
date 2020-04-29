@@ -2,8 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 
-
 # Create your models here.
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Quiz(models.Model):
@@ -12,6 +13,7 @@ class Quiz(models.Model):
     pub_date = models.DateTimeField()
     participants = models.IntegerField()
     founder = models.ForeignKey(User, on_delete=models.CASCADE)
+
     # url = models.SlugField(
     #     max_length=60, blank=False,
     #     help_text="a user friendly url",
@@ -44,3 +46,21 @@ class Question(models.Model):
 
     def __str__(self):
         return self.prompt
+
+
+class QuizTakers(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
+
+
+class Response(models.Model):
+    quiztaker = models.ForeignKey(QuizTakers, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    answer = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.question.prompt
