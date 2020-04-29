@@ -33,27 +33,27 @@ def enterQuizCode(request):
     return render(request, 'quiz/enterQuizCode.html')
 
 def playscreen(request):
-    data = request.POST.copy()
-    quiz_id = data.get('quizCode')
-    try:
-        quiz = Quiz.objects.get(pk=quiz_id)
-    except Quiz.DoesNotExist:
-        return render(request, 'quiz/enterQuizCode.html', {'error': 'This Quiz does not exist'})
+    if request.POST['quizCode']:
+        try:
+            quiz = Quiz.objects.get(pk=request.POST['quizCode'])
+        except Quiz.DoesNotExist:
+            return render(request, 'quiz/enterQuizCode.html', {'error': 'This Quiz does not exist'})
 
-    rounds = Round.objects.filter(quiz=quiz)
-    questions = []
-    if quiz.founder == request.user:
-        return render(request, 'quiz/enterQuizCode.html', {'error': 'you cannot play your own quiz'})
-    else:
-        for r in rounds:
-            question = Question.objects.filter(round=r)
-            if question:
-                questions.append(question)
-        if questions.__len__() <= 0:
-            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
+        rounds = Round.objects.filter(quiz=quiz)
+        questions = []
+        if quiz.founder == request.user:
+            return render(request, 'quiz/enterQuizCode.html', {'error': 'you cannot play your own quiz'})
         else:
-            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds, 'questions': questions})
-
+            for r in rounds:
+                question = Question.objects.filter(round=r)
+                if question:
+                    questions.append(question)
+            if questions.__len__() <= 0:
+                return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
+            else:
+                return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds, 'questions': questions})
+    else:
+        return render(request, 'quiz/enterQuizCode.html', {'error': 'you must enter a code'})
 
 def quizdetail(request, quiz_id):
     quiz = get_object_or_404(Quiz, pk=quiz_id)
