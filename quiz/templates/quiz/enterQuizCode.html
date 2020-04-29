@@ -3,17 +3,20 @@
 <html lang="en">
 {% block content%}
 <body>
-  <h1>Play Quiz</h1>
+<h1>Play Quiz</h1>
 
-  {% if error %}
-  {{ error }}
-  {% endif %}
-  <form action="{% url 'playscreen' %}" method="post">
-  {% csrf_token %}
-  <label for="quizCode">Enter Quiz Code:</label><br>
-  <input type="text" id="quizCode" name="quizCode"><br>
-  <input type="submit" value="Play">
-  </form>
+{% if error %}
+{{ error }}
+{% endif %}
+<form action="{% url 'playscreen' %}" method="post">
+    {% csrf_token %}
+    <label for="quizCode">Enter Quiz Code:</label>
+    <br>
+    <input type="text" id="quizCode" name="quizCode">
+    <br>
+    <br>
+    <input type="submit" value="Play">
+</form>
 </body>
 {% endblock %}
 </html>

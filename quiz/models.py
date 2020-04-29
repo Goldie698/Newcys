@@ -31,6 +31,7 @@ class Round(models.Model):
     title = models.CharField(max_length=200)
     # number = models.IntegerField(default=1)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    score = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title

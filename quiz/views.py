@@ -1,9 +1,7 @@
-from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from .models import Quiz, Round, Question
 from django.utils import timezone
-from django import forms
-
 
 
 # Create your views here.
@@ -29,8 +27,10 @@ def create(request):
     else:
         return render(request, 'quiz/create.html')
 
+
 def enterQuizCode(request):
     return render(request, 'quiz/enterQuizCode.html')
+
 
 def playscreen(request):
     if request.POST['quizCode']:
@@ -40,36 +40,21 @@ def playscreen(request):
             return render(request, 'quiz/enterQuizCode.html', {'error': 'This Quiz does not exist'})
 
         rounds = Round.objects.filter(quiz=quiz)
-        questions = []
         if quiz.founder == request.user:
             return render(request, 'quiz/enterQuizCode.html', {'error': 'you cannot play your own quiz'})
         else:
-            for r in rounds:
-                question = Question.objects.filter(round=r)
-                if question:
-                    questions.append(question)
-            if questions.__len__() <= 0:
-                return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
-            else:
-                return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds, 'questions': questions})
+            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
     else:
         return render(request, 'quiz/enterQuizCode.html', {'error': 'you must enter a code'})
+
 
 def quizdetail(request, quiz_id):
     quiz = get_object_or_404(Quiz, pk=quiz_id)
     rounds = Round.objects.filter(quiz=quiz)
-    questions = []
     if quiz.founder == request.user:
         return render(request, 'quiz/quizdetail.html', {'quiz': quiz, 'rounds': rounds})
     else:
-        for r in rounds:
-            question = Question.objects.filter(round=r)
-            if question:
-                questions.append(question)
-        if questions.__len__() <= 0:
-            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
-        else:
-            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds, 'questions': questions})
+        return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
 
 
 def round(request, quiz_id):
@@ -127,20 +112,31 @@ def submitquestion(request, quiz_id, round_id):
     else:
         return render(request, 'quiz/questions.html')
 
+
 @login_required(login_url='login')
 def editquiz(request):
     quizzes = Quiz.objects.filter(founder=request.user)
     return render(request, 'quiz/editquiz.html', {'quizzes': quizzes})
 
 
-# def playquiz(request, q_id):
-#     if request.method == 'POST':
-#         question = get_object_or_404(Question, pk=q_id)
-#         # questions = Question.objects.filter(round=round)
-#         answer = request.POST['answer' + str(q_id)]
-#         print(answer)
-#         if question.answer == answer:
-#             # form = request.POST
-#             return redirect(request.META.get('HTTP_REFERER', {'answer': answer}))
-#         else:
-#             pass
+def playquiz(request, round_id):
+    round = get_object_or_404(Round, pk=round_id)
+    questions = Question.objects.filter(round=round)
+    count = 0
+    if request.method == 'GET':
+        return render(request, 'quiz/playround.html', {'round': round, 'questions': questions})
+    elif request.method == 'POST':
+        for q in questions:
+            answerId = q.id
+            # print(request.POST.get(str(answerId), None))
+            if request.POST[str(answerId)] and request.POST[str(answerId).lower()] == str(q.answer).lower():
+                count += 1
+                print('Found the right answer')
+            else:
+                print('Incorrect answer' + str(q.prompt))
+    quiz = round.quiz
+    rounds = Round.objects.filter(quiz=quiz)
+    round.score = count
+    return render(request, 'quiz/playquiz.html',
+                  {'quiz': quiz, 'rounds': rounds,
+                   'answers': 'Previously correct: ' + str(count) + '/' + str(len(questions)), 'played': round})

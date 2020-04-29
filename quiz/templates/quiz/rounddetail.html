@@ -13,6 +13,9 @@
 <div class="container">
     <h1> {{round.title}}</h1>
     <br>
+    {% if error %}
+    {{ error }}
+    {% endif %}
     <div>
         <a href="{% url 'questions' quiz.id round.id%}" class="btn btn-primary my-2">Add Question</a>
     </div>

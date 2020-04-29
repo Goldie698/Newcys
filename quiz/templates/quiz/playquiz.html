@@ -13,29 +13,19 @@
     <p>Created by: {{quiz.founder}}</p>
     <br>
 </div>
-
+<br>
 {% for round in rounds%}
-<br>
 <h3>{{ round }}</h3>
-<br>
-{% for question in questions %}
-{% for q in question %}
-<form method="POST" action="" enctype="multipart/form-data">
-    {% if q.round == round %}
-    {% csrf_token %}
-    Question: {{q}}
-    <br>
-    Answer:
-    <br>
-    <input type="text" name="answer">
-    <br>
-    <br>
-    {% endif %}
-    {% endfor%}
-    {% endfor %}
-    <input class="btn btn-success" type="submit" value="Submit">
-</form>
+{% if answers %}
+{% if played == round %}
+{{answers}}
+{% endif %}
+{% endif %}
 
+<div>
+    <a href="{% url 'quiz/playquiz' round.id %}" class="Next round">&#8250;Play </a>
+</div>
+<br>
 {% endfor %}
 {% endblock %}
 </html>
