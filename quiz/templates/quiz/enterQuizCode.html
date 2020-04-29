@@ -2,20 +2,16 @@
 {% extends 'base.html' %}
 <html lang="en">
 {% block content%}
-
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
 <body>
   <h1>Play Quiz</h1>
 
-  {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
+  {% if error %}
+  {{ error }}
+  {% endif %}
   <form action="{% url 'playscreen' %}" method="post">
   {% csrf_token %}
   <label for="quizCode">Enter Quiz Code:</label><br>
-  <input type="text" id="quizCode" name="quizCode" value="enter quiz code.."><br>
+  <input type="text" id="quizCode" name="quizCode"><br>
   <input type="submit" value="Play">
   </form>
 </body>

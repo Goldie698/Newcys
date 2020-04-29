@@ -29,15 +29,31 @@ def create(request):
     else:
         return render(request, 'quiz/create.html')
 
-def play(request):
-    return render(request, 'quiz/play.html')
+def enterQuizCode(request):
+    return render(request, 'quiz/enterQuizCode.html')
 
 def playscreen(request):
     data = request.POST.copy()
-    quizCode = data.get('quizCode')
-    context = {'quizCode': quizCode}
-    #need to get the code from the post request from the form
-    return render(request, 'quiz/playscreen.html', context)
+    quiz_id = data.get('quizCode')
+    try:
+        quiz = Quiz.objects.get(pk=quiz_id)
+    except Quiz.DoesNotExist:
+        return render(request, 'quiz/enterQuizCode.html', {'error': 'This Quiz does not exist'})
+
+    rounds = Round.objects.filter(quiz=quiz)
+    questions = []
+    if quiz.founder == request.user:
+        return render(request, 'quiz/enterQuizCode.html', {'error': 'you cannot play your own quiz'})
+    else:
+        for r in rounds:
+            question = Question.objects.filter(round=r)
+            if question:
+                questions.append(question)
+        if questions.__len__() <= 0:
+            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
+        else:
+            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds, 'questions': questions})
+
 
 def quizdetail(request, quiz_id):
     quiz = get_object_or_404(Quiz, pk=quiz_id)
