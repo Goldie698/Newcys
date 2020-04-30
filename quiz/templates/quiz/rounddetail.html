@@ -2,7 +2,9 @@
 {% extends 'base.html' %}
 <html lang="en">
 {% block content%}
-
+{% if error %}
+{{ error }}
+{% endif %}
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -19,12 +21,46 @@
     <div>
         <a href="{% url 'questions' quiz.id round.id%}" class="btn btn-primary my-2">Add Question</a>
     </div>
-    {% for question in questions%}
     <br>
-    <p>Question: {{question.prompt}} </p>
-    <p>Answer: {{question.answer}}</p>
-    {% endfor%}
-    <br>
+    {% if questions or mcquestions %}
+    <h4 class="text-center" style="text-decoration: underline"><strong>Questions summary:</strong></h4>
+    <div class="container">
+        <div style="border: solid grey 0.5px; border-radius: 15px; padding: 15px">
+            <h5><strong> Free text section</strong></h5>
+            {% for question in questions%}
+            <br>
+            <ul>
+                <li>Question: {{question.prompt}} - Answer: {{question.answer}}</li>
+                <hr>
+            </ul>
+            {% endfor%}
+            {% if questions|length_is:"0" %}
+            <p> There are no free text questions in this round</p>
+            {% endif %}
+        </div>
+
+        <div style="border: solid grey 0.5px; border-radius: 15px; padding: 15px">
+            <h5><strong>Multiple choice section</strong></h5>
+            {% for mc in mcquestions %}
+            <br>
+            <ul>
+                <li>Question: {{mc.prompt}} -- Answer: {{mc.answer}}</li>
+                <p> Choices: </p>
+                <ul>
+                    {% for choice in mc.choice_set.all %}
+                    <li> {{choice.choice_text}}</li>
+                    {% endfor %}
+                </ul>
+                <hr>
+            </ul>
+            {% endfor %}
+            {% if mcquestions|length_is:"0" %}
+            <p> There are no Multiple choice questions in this round</p>
+            {% endif %}
+        </div>
+
+    </div>
+    {% endif %}
 </div>
 </body>
 {% endblock %}

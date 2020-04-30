@@ -14,11 +14,6 @@ class Quiz(models.Model):
     participants = models.IntegerField()
     founder = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    # url = models.SlugField(
-    #     max_length=60, blank=False,
-    #     help_text="a user friendly url",
-    #     verbose_name="user friendly url")
-
     def summary(self):
         return self.body[:200]
 

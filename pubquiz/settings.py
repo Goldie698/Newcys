@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'quiz.apps.QuizConfig',
     'accounts.apps.AccountsConfig',
+    'mcquiz.apps.McquizConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -74,13 +75,6 @@ WSGI_APPLICATION = 'pubquiz.wsgi.application'
 
 DATABASES = {
     'default': {
-        #     'ENGINE': 'django.db.backends.postgresql',
-        #     'NAME': 'pubquizdb',
-        #     'USER': 'postgres',
-        #     'PASSWORD': 'pe3ached',
-        #     'HOST': 'localhost',
-        #     'PORT': '5432'
-        # }
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
