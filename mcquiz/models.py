@@ -4,7 +4,6 @@ from django.utils.translation import ugettext_lazy as _
 
 
 # Create your models here.
-# TODO add model for MCQ(Question) and Choices?
 
 class MCQuestion(Question):
 
