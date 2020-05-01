@@ -34,7 +34,7 @@ def create(request):
 def enterQuizCode(request):
     return render(request, 'quiz/enterQuizCode.html')
 
-
+@login_required(login_url='login')
 def playscreen(request):
     if request.POST['quizCode']:
         try:
@@ -58,7 +58,7 @@ def playscreen(request):
     else:
         return render(request, 'quiz/enterQuizCode.html', {'error': 'you must enter a code'})
 
-
+@login_required(login_url='login')
 def quizdetail(request, quiz_id):
     quiz = get_object_or_404(Quiz, pk=quiz_id)
     rounds = Round.objects.filter(quiz=quiz)
