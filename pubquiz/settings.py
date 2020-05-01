@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'quiz.apps.QuizConfig',
     'accounts.apps.AccountsConfig',
-    'mcquiz.apps.McquizConfig',
+    'mcq.apps.McqConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

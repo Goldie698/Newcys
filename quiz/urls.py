@@ -16,10 +16,11 @@ urlpatterns = [
                   path('<int:quiz_id>/createround', views.createround, name='createround'),
                   path('<int:quiz_id>/round/<int:round_id>/', views.rounddetail, name='rounddetail'),
                   path('<int:quiz_id>/round/<int:round_id>/questions', views.questions, name='questions'),
-                  path('<int:quiz_id>/round/<int:round_id>/<int:ques_id>/questiontype', views.questiontype,
+                  path('<int:quiz_id>/round/<int:round_id>/questiontype', views.questiontype,
                        name='questiontype'),
                   path('<int:quiz_id>/round/<int:round_id>/submitquestion', views.submitquestion,
                        name='submitquestion'),
-                  path('<int:quiz_id>/round/<int:round_id>/addchoice', views.addchoice, name='addchoice'),
+                  path('<int:quiz_id>/round/<int:round_id>/submitmcq', views.submitmcq,
+                       name='submitmcq'),
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

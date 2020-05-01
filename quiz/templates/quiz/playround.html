@@ -6,11 +6,12 @@
 {{ error }}
 {% endif %}
 <h1> {{ round }}</h1>
+{% if round.question_set.count != "0" %}
 <div class="container">
     <br>
     <form method="POST" action="{% url 'quiz/playquiz' round.id %}" enctype="multipart/form-data">
         {% csrf_token %}
-        {% for q in questions %}
+        {% for q in round.question_set.all %}
         Question: {{q}}
         <br>
         Answer:
@@ -20,18 +21,32 @@
         <br>
         {% endfor %}
         <input class="btn btn-success" type="submit" value="Submit">
-
     </form>
-
-    <!--    <form method="POST" action="{% url 'quiz/playquiz' round.id %}">-->
-    <!--        {% csrf_token %}-->
-    <!--        <br>-->
-    <!--        {{ questions }}-->
-    <!--        <input class="btn btn-success" type="submit" value="Next">-->
-    <!--    </form>-->
 </div>
+{% endif %}
+
+{% if mcforms %}
+<form method="POST" action="{% url 'quiz/playquiz' round.id %}">
+    {% csrf_token %}
+    {% for mc in mcforms %}
+    <ul>
+        <li>Question: {{mc.prompt}}</li>
+        <br>
+        <ul>
+            {% for choice in mc.choice_set.all %}
+             {{choice.choice_text}} <input type="checkbox" name="choice"> <br>
+            {% endfor %}
+        </ul>
+    </ul>
+    {% endfor %}
+    <input class="btn btn-success" type="submit" value="Submit">
+</form>
+{% endif %}
+{% if error_choices %}
+{{error_choices}}
+{% endif %}
 <br>
-{% if questions|length == "0"%}
+{% if round.question_set.all|length_is:"0" and round.mcquestion_set.all|length_is:"0"%}
 <div class="text-center">
     <a href="{% url 'quiz/playquiz' round.id %}" class="Next round">&#8250;Play </a>
 </div>

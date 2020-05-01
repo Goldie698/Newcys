@@ -15,21 +15,14 @@
     <br>
 </div>
 <br>
-{% for round in rounds%}
+{% for round in rounds %}
 <h3>{{ round }}</h3>
-<p> Previous score: {{ round.score }}%</p>
 {% if answers %}
 {% if played == round %}
 {{answers}}
 {% endif %}
 {% endif %}
-<!--{% if round.score %}-->
 {% if responses %}
-<input type="button" value="Result details" onclick="myFunction()" >
-<div id="resbutton" style="display: none">
-    {{ responses }}
-</div>
-{% endif %}
 <div>
     <a href="{% url 'quiz/playquiz' round.id %}" class="Next round">&#8250;Play Again </a>
 </div>
@@ -40,6 +33,5 @@
 {% endif %}
 <br>
 {% endfor %}
-<script src="{% static 'js/playquiz.js' %}"></script>
 {% endblock %}
 </html>

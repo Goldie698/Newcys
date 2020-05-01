@@ -6,8 +6,17 @@
 {{ error }}
 {% endif %}
 <h1>Quiz Questions</h1>
-
-{% if form is None and mcq is None %}
+{% if form%}
+<form method="POST" action="{% url 'questiontype' quiz.id round.id %}">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>
+{% endif %}
+{% if error_type %}
+<strong style="color: red">{{ error_type }}</strong>
+{% endif %}
+{% if free %}
 <form method="POST" action="{% url 'submitquestion' quiz.id round.id %}" enctype="multipart/form-data">
     {% csrf_token %}
     <br>
@@ -22,41 +31,39 @@
     <br>
     <input class="btn btn-success" type="submit" value="Submit Question">
 </form>
+
 {% endif %}
-{% if question %}
-<form method="POST" action="{% url 'questiontype' quiz.id round.id question.id %}">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
-</form>
-{% endif %}
+
 {% if mcq %}
-Question: {{mcq}}
 <br>
 <div class="alert alert-warning text-center" role="alert">
-    <strong>Please make sure you add the correct answer as one of the choices! </strong></div>
+    <strong>Please make sure you tick the correct answer! </strong></div>
 <br>
-Add choices:
 <br>
 {% if error_add %}
 <strong style="color: red">{{ error_add }}</strong>
 {% endif %}
-<form method="POST" action="{% url 'addchoice' quiz.id round.id %}">
+<form method="POST" action="{% url 'submitmcq' quiz.id round.id %}">
     {% csrf_token %}
+    <br>
+    Question:
+    <br>
+    <input type="text" name="prompt">
+    <br>
     Option 1:
     <br>
-    <input type="text" name="choice_text1">
+    <input type="text" name="choice_text1"> <input type="checkbox" name="correct1">
     <br>
     Option 2:
     <br>
-    <input type="text" name="choice_text2">
+    <input type="text" name="choice_text2"><input type="checkbox" name="correct2">
     <br>
     Option 3:
     <br>
-    <input type="text" name="choice_text3">
+    <input type="text" name="choice_text3"><input type="checkbox" name="correct3">
     <br>
     <br>
-    <input type="submit" value="Add">
+    <input type="submit" value="Submit">
 </form>
 <br>
 {% endif %}
