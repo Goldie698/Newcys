@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from .models import Quiz, Round, Question, QuizTakers, Response
+from .models import Quiz, Round, Question, QuizTakers, Response, RoundTakers
 from django.utils import timezone
 import re
 from .forms import QuestionForm, MCQuestionForm
@@ -46,7 +46,15 @@ def playscreen(request):
         if quiz.founder == request.user:
             return render(request, 'quiz/enterQuizCode.html', {'error': 'you cannot play your own quiz'})
         else:
-            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
+            if QuizTakers.objects.filter(user=request.user, quiz=quiz).exists():
+                quiztaker = QuizTakers.objects.filter(user=request.user, quiz=quiz).first()
+                return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
+            else:
+                quiztaker = QuizTakers()
+                quiztaker.quiz = quiz
+                quiztaker.user = request.user
+                quiztaker.save()
+                return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
     else:
         return render(request, 'quiz/enterQuizCode.html', {'error': 'you must enter a code'})
 
@@ -199,6 +207,7 @@ def playquiz(request, round_id):
     round = get_object_or_404(Round, pk=round_id)
     quiztaker = QuizTakers.objects.filter(user=request.user, quiz=round.quiz)
     if quiztaker:
+        count = 0
         questions = Question.objects.filter(round=round)
         mcquestions = MCQuestion.objects.filter(round=round)
         if request.method == 'GET':
@@ -219,6 +228,7 @@ def playquiz(request, round_id):
                         response.answer = choice.choice_text
                         response.save()
                     if mcq.check_if_correct(request.POST[str(mcq.id)]):
+                        count += 1
                         print('Correct!')
                     else:
                         print('Incorrect!')
@@ -227,40 +237,70 @@ def playquiz(request, round_id):
                     error = 'You must choose one answer per question'
                     return render(request, 'playround.html',
                                   {'round': round, 'mcforms': mcquestions, 'error_choices': error})
-        for q in questions:
-            answerId = q.id
-            if request.POST[str(answerId)]:
-                answer = str(q.answer)
-                useranswer = request.POST[str(answerId).lower()]
-                if Response.objects.filter(quiztaker=quiztaker.first(), question=q).exists():
-                    response = Response.objects.filter(quiztaker=quiztaker.first(), question=q).first()
-                    response.answer = useranswer
-                    userResponses.append(response)
-                    if re.findall('(?i)' + answer, useranswer):
-                        print('Found the right answer')
+            for q in questions:
+                answerId = q.id
+                if request.POST[str(answerId)]:
+                    answer = str(q.answer)
+                    useranswer = request.POST[str(answerId).lower()]
+                    if Response.objects.filter(quiztaker=quiztaker.first(), question=q).exists():
+                        response = Response.objects.filter(quiztaker=quiztaker.first(), question=q).first()
+                        response.answer = useranswer
+                        userResponses.append(response)
+                        if re.findall('(?i)' + answer, useranswer):
+                            count +=1
+                            print('Found the right answer')
+                        else:
+                            print('Incorrect answer' + str(q.prompt))
                     else:
-                        print('Incorrect answer' + str(q.prompt))
-                    quiz = round.quiz
-                    rounds = Round.objects.filter(quiz=quiz)
-                    return render(request, 'quiz/playquiz.html',
-                                  {'quiz': quiz, 'rounds': rounds,
-                                   'answers': 'Result:/' + str(len(questions)), 'played': round,
-                                   'len': str(len(questions)), 'responses': userResponses})
-                else:
-                    print('Response not found')
-                    response = Response()
-                    response.quiztaker = quiztaker.first()
-                    response.question = q
-                    response.answer = useranswer
-                    response.save()
-                    userResponses.append(response)
-                if re.findall('(?i)' + answer, useranswer):
-                    print('Found the right answer')
-                else:
-                    print('Incorrect answer' + str(q.prompt))
+                        print('Response not found')
+                        response = Response()
+                        response.quiztaker = quiztaker.first()
+                        response.question = q
+                        response.answer = useranswer
+                        response.save()
+                        userResponses.append(response)
+                        if re.findall('(?i)' + answer, useranswer):
+                            count += 1
+                            print('Found the right answer')
+                        else:
+                            print('Incorrect answer' + str(q.prompt))
+            if RoundTakers.objects.filter(user=request.user, round=round).exists():
+                print('have roundtaker')
+                roundtaker = RoundTakers.objects.filter(user=request.user, round=round).first()
+                roundtaker.score = count
+                roundtaker.save()
+            else:
+                print('no roundtaker')
+                roundtaker = RoundTakers()
+                roundtaker.round = round
+                roundtaker.user = request.user
+                roundtaker.score = count
+                roundtaker.save()
+            quiz = round.quiz
+            rounds = Round.objects.filter(quiz=quiz)
+            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds
+                                    , 'played': round})
+    else:
+        print('Something went wrong')
+
+def seeAnswers(request, round_id):
+    round = get_object_or_404(Round, pk=round_id)
+    quizQuestions = Question.objects.filter(round=round)
     quiz = round.quiz
-    rounds = Round.objects.filter(quiz=quiz)
-    return render(request, 'quiz/playquiz.html',
-                  {'quiz': quiz, 'rounds': rounds,
-                   'answers': 'Result:/' + str(len(questions)), 'played': round,
-                   'len': str(len(questions)), 'responses': userResponses})
+    questions = {}
+    quizTaker=QuizTakers.objects.get(user=request.user, quiz=quiz)
+    roundTaker=RoundTakers.objects.get(user=request.user, round=round)
+    roundScore=[]
+    roundScore.append(roundTaker.score)
+    roundScore.append(len(quizQuestions))
+    for q in quizQuestions:
+        answers = []
+        answers.append(q.answer)
+        answers.append(Response.objects.get(question=q, quiztaker=quizTaker).answer)
+        if re.findall('(?i)' + answers[0], answers[1]):
+            answers.append('yes')
+        else:
+            answers.append('no')
+        questions[q.prompt] = answers
+    return  render(request, 'quiz/seeAnswers.html', {'quiz': quiz, 'round': round, 'questions': questions, 'score': roundScore})
+    # return render(request, 'quiz/seeAnswers.html', {'round': round, 'questions': questions})
