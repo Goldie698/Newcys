@@ -4,19 +4,25 @@
 {% block content%}
 <body>
 <h1>Play Quiz</h1>
+<br>
 
-{% if error %}
-{{ error }}
-{% endif %}
 <form action="{% url 'playscreen' %}" method="post">
     {% csrf_token %}
-    <label for="quizCode">Enter Quiz Code:</label>
-    <br>
-    <input type="text" id="quizCode" name="quizCode">
+    <label for="quizCode">Please enter the code for the quiz you would like to play:</label>
     <br>
     <br>
-    <input type="submit" value="Play">
+    <div style="width: 22%; margin-left: 7%">
+        <input type="text" class="form-control" id="quizCode" name="quizCode" placeholder="Enter quiz code">
+    </div>
+    <br>
+    <div style=" margin-left: 13%">
+        <input type="submit" value="Play" class="btn btn-info" style="width: 10%">
+    </div>
 </form>
+<br>
+{% if error %}
+<strong style="color: red; margin-left: 10%">{{ error }}</strong>
+{% endif %}
 </body>
 {% endblock %}
 </html>

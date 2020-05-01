@@ -133,16 +133,14 @@ def submitmcq(request, quiz_id, round_id):
     if request.method == 'POST':
         round = Round.objects.get(pk=round_id)
         quiz = Quiz.objects.get(pk=quiz_id)
-        if request.POST['prompt'] and request.POST['choice_text1'] and request.POST['choice_text2'] and request.POST[
-            'choice_text3']:
-            choice1 = request.POST['choice_text1']
-            choice2 = request.POST['choice_text2']
-            choice3 = request.POST['choice_text3']
+        if request.POST['prompt'] and request.POST.get('choice_text1') and request.POST.get('choice_text2') and request.POST.get('choice_text3') and request.POST.get('correct'):
+            choice1 = request.POST.get('choice_text1')
+            choice2 = request.POST.get('choice_text2')
+            choice3 = request.POST.get('choice_text3')
             mcquestion = MCQuestion()
             mcquestion.prompt = request.POST['prompt']
             mcquestion.round = round
             mcquestion.save()
-            on = 'on'
             if request.POST.get('correct1'):
                 mcquestion.choice_set.create(choice_text=choice1, correct=True)
             else:
@@ -158,6 +156,10 @@ def submitmcq(request, quiz_id, round_id):
             mcquestions = MCQuestion.objects.filter(round=round)
             return render(request, 'quiz/rounddetail.html',
                           {'quiz': quiz, 'round': round, 'mcquestions': mcquestions})
+        else:
+            error = 'All fields must be filled! Make sure you pick an answer'
+            return render(request, 'quiz/questions.html',
+                          {'quiz': quiz, 'round': round, 'mcq': 'mcq', 'error_answer': error})
 
 
 def questiontype(request, quiz_id, round_id):
@@ -262,4 +264,3 @@ def playquiz(request, round_id):
                   {'quiz': quiz, 'rounds': rounds,
                    'answers': 'Result:/' + str(len(questions)), 'played': round,
                    'len': str(len(questions)), 'responses': userResponses})
-

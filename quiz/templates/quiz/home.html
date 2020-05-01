@@ -3,19 +3,8 @@
 <html lang="en">
 {% block content%}
 {% load static %}
-<div class="main-tabs-docs">
-    <ul class="nav nav-mtd tabs-info z-depth-1">
-        <li class="nav-item">
-            <a class="nav-item nav-link" href="{% url 'create' %}">Create Quiz</a></li>
-        <li class="nav-item">
-            <a class="nav-item nav-link" href="{% url 'enterQuizCode' %}">Play Quiz</a></li>
-        <li class="nav-item">
-            <a class="nav-item nav-link" href="{% url 'quiz/editquiz' %}">Edit Quiz</a></li>
-    </ul>
-</div>
 <br>
 <h4 class="text-center">Current Quizzes:</h4>
-<br>
 <br>
 <div class="album py-5 bg-light">
     <div class="container">
@@ -25,7 +14,7 @@
                 <div class="card mb-4 shadow-sm">
                     <img class="card-img-top img-fluid" src="{% static 'quiz2.png' %}" alt="Card image cap">
                     <div class="card-body">
-                        <a href="{% url 'quizdetail' quiz.id %}" class="card-text text-center">{{ quiz.title }}</a>
+                        <a href="{% url 'quizdetail' quiz.id %}" class="card-text text-center" title="Click to play">{{ quiz.title }}</a>
                     </div>
                 </div>
             </div>

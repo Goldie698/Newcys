@@ -6,66 +6,101 @@
 {{ error }}
 {% endif %}
 <h1>Quiz Questions</h1>
-{% if form%}
-<form method="POST" action="{% url 'questiontype' quiz.id round.id %}">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
-</form>
-{% endif %}
-{% if error_type %}
-<strong style="color: red">{{ error_type }}</strong>
-{% endif %}
-{% if free %}
-<form method="POST" action="{% url 'submitquestion' quiz.id round.id %}" enctype="multipart/form-data">
-    {% csrf_token %}
+<div class="container">
+    {% if form %}
     <br>
-    Question:
-    <br>
-    <input type="text" name="prompt">
-    <br>
-    Answer:
-    <br>
-    <input type="text" name="answer">
-    <br>
-    <br>
-    <input class="btn btn-success" type="submit" value="Submit Question">
-</form>
+    <div class="container">
+        <p> Please choose the type of questions you would like this round to contain:</p>
+        <br>
+        <form method="POST" action="{% url 'questiontype' quiz.id round.id %}" style="margin-left: 2%">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Submit" class="btn btn-success">
+        </form>
+        {% endif %}
+        {% if error_type %}
+        <strong style="color: red">{{ error_type }}</strong>
+        {% endif %}
+    </div>
+    <div style="margin-left: 2%">
+        {% if free %}
+        <form method="POST" action="{% url 'submitquestion' quiz.id round.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <br>
+            Question:
+            <br>
+            <input type="text" name="prompt">
+            <br>
+            Answer:
+            <br>
+            <input type="text" name="answer">
+            <br>
+            <br>
+            <input class="btn btn-success" type="submit" value="Submit Question">
+        </form>
 
-{% endif %}
+        {% endif %}
+    </div>
+    <div style="margin-left: 2%">
+        {% if mcq %}
+        <br>
+        <div class="alert alert-warning text-center" role="alert">
+            <strong>Please make sure you tick the correct answer! </strong></div>
+        {% if error_add %}
+        <strong style="color: red">{{ error_add }}</strong>
+        {% endif %}
+        <form method="POST" action="{% url 'submitmcq' quiz.id round.id %}">
+            {% csrf_token %}
+            <br>
+            Question:
+            <br>
+            <div>
+                <input type="text" class="form-control" name="prompt" style="width: 40%">
+            </div>
+            <br>
+            Option 1:
+            <br>
+            <div class="input-group" style="width: 25%">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <input type="radio" name="correct" aria-label="Radio button for following text input">
+                    </div>
+                </div>
+                <input type="text" class="form-control form-control-sm" name="choice_text1">
+            </div>
+            <br>
+            Option 2:
+            <br>
+            <div class="input-group" style="width: 25%">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <input type="radio" name="correct" aria-label="Radio button for following text input">
+                    </div>
+                </div>
+                <input type="text" class="form-control form-control-sm" name="choice_text2">
+            </div>
+            <br>
+            Option 3:
+            <br>
+            <div class="input-group" style="width: 25%">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <input type="radio" name="correct" aria-label="Radio button for following text input">
+                    </div>
+                </div>
+                <input type="text" class="form-control form-control-sm" name="choice_text3">
+            </div>
+            <br>
+            <input type="submit" value="Submit" class="btn btn-primary">
+        </form>
+        {% if error_answer %}
+            <strong style="color: red">{{error_answer}} </strong>
+        {% endif %}
+        <br>
+        {% endif %}
+        <br>
+    </div>
+</div>
 
-{% if mcq %}
-<br>
-<div class="alert alert-warning text-center" role="alert">
-    <strong>Please make sure you tick the correct answer! </strong></div>
-<br>
-<br>
-{% if error_add %}
-<strong style="color: red">{{ error_add }}</strong>
-{% endif %}
-<form method="POST" action="{% url 'submitmcq' quiz.id round.id %}">
-    {% csrf_token %}
-    <br>
-    Question:
-    <br>
-    <input type="text" name="prompt">
-    <br>
-    Option 1:
-    <br>
-    <input type="text" name="choice_text1"> <input type="checkbox" name="correct1">
-    <br>
-    Option 2:
-    <br>
-    <input type="text" name="choice_text2"><input type="checkbox" name="correct2">
-    <br>
-    Option 3:
-    <br>
-    <input type="text" name="choice_text3"><input type="checkbox" name="correct3">
-    <br>
-    <br>
-    <input type="submit" value="Submit">
-</form>
-<br>
-{% endif %}
 {% endblock %}
 </html>
