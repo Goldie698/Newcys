@@ -10,6 +10,6 @@ pytz==2019.3
 six==1.14.0
 sqlparse==0.3.1
 virtualenv==20.0.16
-requests==2.19.1
+requests==2.20.0
 gunicorn==20.0.4
 django-heroku
