@@ -34,7 +34,7 @@
         <br>
         <ul>
             {% for choice in mc.choice_set.all %}
-            <label for="choice"> {{choice.choice_text}}</label> <input type="radio" name="{{mc.id}}" value="{{choice.id}}"> <br>
+            <label> {{choice.choice_text}}</label> <input type="radio" name="{{mc.id}}" value="{{choice.id}}"> <br>
             {% endfor %}
         </ul>
     </ul>

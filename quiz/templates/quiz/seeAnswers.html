@@ -2,25 +2,26 @@
 {% extends 'base.html' %}
 <html lang="en">
 {% block content%}
-{% if error %}
-{{ error }}
-{% endif %}
 <h1> {{ round }}</h1>
 <div class="container">
     <br>
+    {% if error %}
+    <p style="color: red">{{ error }}</p>
+    {% endif %}
+    <br>
     {% csrf_token %}
-        {% for q in questions.items %}
-        Question: {{q.0}}
-        <br>
-        Your Answer: {{q.1.1}}
-        <br>
-        Correct Answer: {{q.1.0}}
-        <br>
-        {% if q.1.2 == 'yes' %}
-        <p> you got it right </p>
-        {% endif %}
-        <br>
-        {% endfor %}
+    {% for q in questions.items %}
+    Question: {{q.0}}
+    <br>
+    Your Answer: {{q.1.1}}
+    <br>
+    Correct Answer: {{q.1.0}}
+    <br>
+    {% if q.1.2 == 'yes' %}
+    <p> you got it right </p>
+    {% endif %}
+    <br>
+    {% endfor %}
     <h1> Round Score: {{score.0}}/{{score.1}}</h1>
 </div>
 <br>
@@ -28,8 +29,10 @@
 <div class="text-center">
     <a href="{% url 'quiz/playquiz' round.id %}" class="Next round">&#8250;Play </a>
 </div>
-
 <br>
 {% endif %}
+<div class="text-center">
+    <a href="{% url 'quizdetail' quiz.id %}">Back to quiz </a>
+</div>
 {% endblock %}
 </html>

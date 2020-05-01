@@ -34,6 +34,7 @@ def create(request):
 def enterQuizCode(request):
     return render(request, 'quiz/enterQuizCode.html')
 
+
 @login_required(login_url='login')
 def playscreen(request):
     if request.POST['quizCode']:
@@ -57,6 +58,7 @@ def playscreen(request):
                 return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
     else:
         return render(request, 'quiz/enterQuizCode.html', {'error': 'you must enter a code'})
+
 
 @login_required(login_url='login')
 def quizdetail(request, quiz_id):
@@ -141,7 +143,8 @@ def submitmcq(request, quiz_id, round_id):
     if request.method == 'POST':
         round = Round.objects.get(pk=round_id)
         quiz = Quiz.objects.get(pk=quiz_id)
-        if request.POST['prompt'] and request.POST.get('choice_text1') and request.POST.get('choice_text2') and request.POST.get('choice_text3') and request.POST.get('correct'):
+        if request.POST['prompt'] and request.POST.get('choice_text1') and request.POST.get(
+                'choice_text2') and request.POST.get('choice_text3'):
             choice1 = request.POST.get('choice_text1')
             choice2 = request.POST.get('choice_text2')
             choice3 = request.POST.get('choice_text3')
@@ -161,6 +164,7 @@ def submitmcq(request, quiz_id, round_id):
                 mcquestion.choice_set.create(choice_text=choice3, correct=True)
             else:
                 mcquestion.choice_set.create(choice_text=choice3, correct=False)
+            mcquestion.save()
             mcquestions = MCQuestion.objects.filter(round=round)
             return render(request, 'quiz/rounddetail.html',
                           {'quiz': quiz, 'round': round, 'mcquestions': mcquestions})
@@ -213,7 +217,6 @@ def playquiz(request, round_id):
         if request.method == 'GET':
             return render(request, 'quiz/playround.html', {'round': round, 'mcforms': mcquestions})
         elif request.method == 'POST':
-            userResponses = []
             for mcq in mcquestions:
                 if request.POST.get(str(mcq.id)):
                     choice = Choice.objects.get(pk=request.POST[str(mcq.id)])
@@ -243,22 +246,15 @@ def playquiz(request, round_id):
                     answer = str(q.answer)
                     useranswer = request.POST[str(answerId).lower()]
                     if Response.objects.filter(quiztaker=quiztaker.first(), question=q).exists():
-                        response = Response.objects.filter(quiztaker=quiztaker.first(), question=q).first()
+                        response = Response.objects.filter(quiztaker=quiztaker.first(), question=q).last()
                         response.answer = useranswer
-                        userResponses.append(response)
-                        if re.findall('(?i)' + answer, useranswer):
-                            count +=1
-                            print('Found the right answer')
-                        else:
-                            print('Incorrect answer' + str(q.prompt))
+                        response.save()
                     else:
-                        print('Response not found')
                         response = Response()
                         response.quiztaker = quiztaker.first()
                         response.question = q
                         response.answer = useranswer
                         response.save()
-                        userResponses.append(response)
                         if re.findall('(?i)' + answer, useranswer):
                             count += 1
                             print('Found the right answer')
@@ -279,27 +275,34 @@ def playquiz(request, round_id):
             quiz = round.quiz
             rounds = Round.objects.filter(quiz=quiz)
             return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds
-                                    , 'played': round})
+                , 'played': round})
     else:
         print('Something went wrong')
+
 
 def seeAnswers(request, round_id):
     round = get_object_or_404(Round, pk=round_id)
     quizQuestions = Question.objects.filter(round=round)
     quiz = round.quiz
     questions = {}
-    quizTaker=QuizTakers.objects.get(user=request.user, quiz=quiz)
-    roundTaker=RoundTakers.objects.get(user=request.user, round=round)
+    quizTaker = QuizTakers.objects.get(user=request.user, quiz=quiz)
+    roundTaker = RoundTakers.objects.get(user=request.user, round=round)
     if quizQuestions:
         for q in quizQuestions:
             answers = []
             answers.append(q.answer)
-            answers.append(Response.objects.get(question=q, quiztaker=quizTaker).answer)
-            if re.findall('(?i)' + answers[0], answers[1]):
-                answers.append('yes')
+            if Response.objects.filter(question=q, quiztaker=quizTaker).exists():
+                answers.append(Response.objects.get(question=q, quiztaker=quizTaker).answer)
+                if re.findall('(?i)' + answers[0], answers[1]):
+                    answers.append('yes')
+                else:
+                    answers.append('no')
+                questions[q.prompt] = answers
+            # return render(request, 'quiz/seeAnswers.html', {'round': round, 'questions': questions})
             else:
-                answers.append('no')
-            questions[q.prompt] = answers
+                error = 'You did not provide answers!'
+                return render(request, 'quiz/seeAnswers.html',
+                              {'quiz': quiz, 'round': round, 'questions': questions, 'error': error})
     else:
         quizQuestions = MCQuestion.objects.filter(round=round)
         for mcq in quizQuestions:
@@ -314,7 +317,8 @@ def seeAnswers(request, round_id):
             else:
                 answers.append('no')
             questions[mcq.prompt] = answers
-    roundScore=[]
+    roundScore = []
     roundScore.append(roundTaker.score)
     roundScore.append(len(quizQuestions))
-    return  render(request, 'quiz/seeAnswers.html', {'quiz': quiz, 'round': round, 'questions': questions, 'score': roundScore})
+    return render(request, 'quiz/seeAnswers.html',
+                  {'quiz': quiz, 'round': round, 'questions': questions, 'score': roundScore})
