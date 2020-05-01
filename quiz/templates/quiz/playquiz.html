@@ -17,7 +17,7 @@
 <br>
 {% for round in rounds%}
 <h3>{{ round }}</h3>
-<p> Previous score: {{ round.score }}%</p>
+<!-- <p> Previous score: {{ round.score }}%</p> -->
 {% if answers %}
 {% if played == round %}
 {{answers}}
@@ -33,11 +33,13 @@
 <div>
     <a href="{% url 'quiz/playquiz' round.id %}" class="Next round">&#8250;Play Again </a>
 </div>
-{% else %}
+<!-- {% else %} -->
+<div>
+    <a href="{% url 'quiz/seeAnswers' round.id%}" class="Next round">&#8350;View Answers </a>
 <div>
     <a href="{% url 'quiz/playquiz' round.id %}" class="Next round">&#8250;Play </a>
 </div>
-{% endif %}
+<!-- {% endif %} -->
 <br>
 {% endfor %}
 <script src="{% static 'js/playquiz.js' %}"></script>

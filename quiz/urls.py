@@ -5,6 +5,7 @@ from . import views
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('<int:round_id>/seeAnswers', views.seeAnswers, name='quiz/seeAnswers'),
     path('playscreen', views.playscreen, name='playscreen'),
     path('enterQuizCode', views.enterQuizCode, name='enterQuizCode'),
     path('create', views.create, name='create'),

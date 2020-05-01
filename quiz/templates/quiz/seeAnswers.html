@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+<html lang="en">
+{% block content%}
+{% if error %}
+{{ error }}
+{% endif %}
+<h1> {{ round }}</h1>
+<div class="container">
+    <br>
+    {% csrf_token %}
+        {% for q in questions %}
+        Question: {{q}}
+        <br>
+        Your Answer:
+        <br>
+        Correct Answer: {{q.answer}}
+        <br>
+        <br>
+        {% endfor %}
+</div>
+<br>
+{% if questions|length == "0"%}
+<div class="text-center">
+    <a href="{% url 'quiz/playquiz' round.id %}" class="Next round">&#8250;Play </a>
+</div>
+
+<br>
+{% endif %}
+{% endblock %}
+</html>

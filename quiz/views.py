@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from .models import Quiz, Round, Question, QuizTakers, Response
+from .models import Quiz, Round, Question, QuizTakers, RoundTakers, Response
 from django.utils import timezone
 import re
 
@@ -44,7 +44,11 @@ def playscreen(request):
         if quiz.founder == request.user:
             return render(request, 'quiz/enterQuizCode.html', {'error': 'you cannot play your own quiz'})
         else:
-            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
+            quiztaker = QuizTakers()
+            quiztaker.quiz = quiz
+            quiztaker.user = request.user
+            quiztaker.save()
+            return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds, 'quiztaker': quiztaker})
     else:
         return render(request, 'quiz/enterQuizCode.html', {'error': 'you must enter a code'})
 
@@ -59,7 +63,7 @@ def quizdetail(request, quiz_id):
         quiztaker.quiz = quiz
         quiztaker.user = request.user
         quiztaker.save()
-        return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds})
+        return render(request, 'quiz/playquiz.html', {'quiz': quiz, 'rounds': rounds, 'quiztaker': quiztaker})
 
 
 def round(request, quiz_id):
@@ -127,6 +131,7 @@ def editquiz(request):
 def playquiz(request, round_id):
     round = get_object_or_404(Round, pk=round_id)
     quiztaker = QuizTakers.objects.filter(user=request.user, quiz=round.quiz)
+    print(quiztaker)
     if quiztaker:
         questions = Question.objects.filter(round=round)
         count = 0
@@ -151,6 +156,11 @@ def playquiz(request, round_id):
                         print('Found the right answer')
                     else:
                         print('Incorrect answer' + str(q.prompt))
+        roundtaker = RoundTakers()
+        roundtaker.round = round
+        roundtaker.user = request.user
+        roundtaker.score = count
+        roundtaker.save()
         quiz = round.quiz
         count2 = (count / len(questions) * 100)
         # round.score = count2
@@ -162,3 +172,16 @@ def playquiz(request, round_id):
                        'len': str(len(questions)), 'responses': userResponses})
     else:
         print('Something went wrong')
+
+def seeAnswers(request, round_id):
+    round = get_object_or_404(Round, pk=round_id)
+    # print(round.id)
+    # quiz = round.quiz
+    questions = Question.objects.filter(round=round)
+    # responses = []
+    # quizTaker=QuizTakers.objects.get(user=request.user, quiz=quiz)
+    # for q in questions:
+    #     responses.append(Response.objects.get(question=q, quiztaker=quizTaker))
+    # print(responses)
+    # return render(request, 'quiz/seeAnswers.html', {'quiz': quiz, 'rounds': rounds,'responses': responses})
+    return render(request, 'quiz/seeAnswers.html', {'round': round, 'questions': questions})
