@@ -10,3 +10,4 @@ pytz==2019.3
 six==1.14.0
 sqlparse==0.3.1
 virtualenv==20.0.16
+requests==2.19.1
