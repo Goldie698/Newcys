@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 from django.db import models
-from quiz.models import Round
+from quiz.models import Round, QuizTakers
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -41,3 +41,12 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.choice_text
+
+
+class MCQResponse(models.Model):
+    quiztaker = models.ForeignKey(QuizTakers, on_delete=models.CASCADE)
+    question = models.ForeignKey(MCQuestion, on_delete=models.CASCADE)
+    answer = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.question.prompt + self.answer
