@@ -290,17 +290,31 @@ def seeAnswers(request, round_id):
     questions = {}
     quizTaker=QuizTakers.objects.get(user=request.user, quiz=quiz)
     roundTaker=RoundTakers.objects.get(user=request.user, round=round)
+    if quizQuestions:
+        for q in quizQuestions:
+            answers = []
+            answers.append(q.answer)
+            answers.append(Response.objects.get(question=q, quiztaker=quizTaker).answer)
+            if re.findall('(?i)' + answers[0], answers[1]):
+                answers.append('yes')
+            else:
+                answers.append('no')
+            questions[q.prompt] = answers
+    else:
+        quizQuestions = MCQuestion.objects.filter(round=round)
+        for mcq in quizQuestions:
+            answers = []
+            choices = mcq.choice_set.all()
+            for c in choices:
+                if c.correct:
+                    answers.append(c.choice_text)
+            answers.append(MCQResponse.objects.get(question=mcq, quiztaker=quizTaker).answer)
+            if re.findall('(?i)' + answers[0], answers[1]):
+                answers.append('yes')
+            else:
+                answers.append('no')
+            questions[mcq.prompt] = answers
     roundScore=[]
     roundScore.append(roundTaker.score)
     roundScore.append(len(quizQuestions))
-    for q in quizQuestions:
-        answers = []
-        answers.append(q.answer)
-        answers.append(Response.objects.get(question=q, quiztaker=quizTaker).answer)
-        if re.findall('(?i)' + answers[0], answers[1]):
-            answers.append('yes')
-        else:
-            answers.append('no')
-        questions[q.prompt] = answers
     return  render(request, 'quiz/seeAnswers.html', {'quiz': quiz, 'round': round, 'questions': questions, 'score': roundScore})
-    # return render(request, 'quiz/seeAnswers.html', {'round': round, 'questions': questions})
