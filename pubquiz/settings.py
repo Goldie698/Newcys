@@ -9,8 +9,19 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
+import dj_database_url       # Keep at top - for deployment
+from decouple import config  # Keep at top - for deployment
 
 import os
+
+# Added to deploy on Heroku
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', default=False, cast=bool)
+DATABASES = {
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL')
+    )
+}
 
 # Added to deploy on Heroku
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
